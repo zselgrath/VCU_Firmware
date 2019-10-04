@@ -776,7 +776,7 @@ private:
 };
 
 // This is a debugging and development class. What it does depends on what is being worked on.
-class DoSpecificDebugThing : public VCUTask {
+class WriteTorqueValue : public VCUTask {
 public:
     void execute() override {
       float genericTorque = pVCU->calculateTorqueRegisterValueForWrite();
@@ -813,7 +813,7 @@ public:
       // Serial.println("Files: " + String(fileCount));
     }
 
-    explicit DoSpecificDebugThing(VCU *vcuPointer) {
+    explicit WriteTorqueValue(VCU *vcuPointer) {
         this->pVCU = vcuPointer;
     }
 
@@ -822,6 +822,7 @@ private:
 
     VCU *pVCU;
 };
+
 
 // This class allows using the serial terminal to send commands to be processed.
 class ProcessSerialInput : public VCUTask {

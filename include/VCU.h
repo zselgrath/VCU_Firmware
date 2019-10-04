@@ -233,6 +233,7 @@ protected:
     // Friend classes (usually VCUTask classes) which can access the protected VCU variables here
     friend class UpdateThrottleAnalogValues;
     friend class DoSpecificDebugThing;
+    friend class WriteTorqueValue;
     friend class SaveDataToSD;
     friend class VehicleStateTask;
     friend class OffState; // Friended to allow writing values to stop motor controller

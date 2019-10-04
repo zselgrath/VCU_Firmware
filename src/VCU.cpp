@@ -212,7 +212,7 @@ void VCU::init() {
     tasks[3] = new SaveDataToSD(this);
     tasks[4] = new ValidateShutdownCircuitCurrent(this->sdcpSamples, this->sdcnSamples);
     tasks[5] = new PrintStatus(this);
-    tasks[6] = new DoSpecificDebugThing(this);
+    tasks[6] = new WriteTorqueValue(this);
     tasks[7] = new ProcessSerialInput(this);
     tasks[8] = new UpdateImu(&(this->imuAccel), &(this->imuMag), &(this->imuGyro), &(this->imuTemperature));
     tasks[9] = new HandlePumpAndFan(this);
