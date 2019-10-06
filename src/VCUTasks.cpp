@@ -780,14 +780,24 @@ class WriteTorqueValue : public VCUTask {
 public:
     void execute() override {
       float genericTorque = pVCU->calculateTorqueRegisterValueForWrite();
+      Serial.print("RAW torque: ");
+      Serial.print(genericTorque);
+      int packCurrent = (mcObjects[2].values[1] << 8) + mcObjects[2].values[0];
+      int derateCurrent = 300;
+      if (packCurrent>derateCurrent){
+        genericTorque=genericTorque*0.7;
+      }
+      Serial.print("DERATED torque: ");
+      Serial.print(genericTorque);
+
 //      Serial.println("I could set torque to " + String(genericTorque));
       // Serial.println(String(genericTorque));
       //Serial.println(pVCU->getCheckedAndScaledAppsValue());
       //Serial.println("VCU: " + String("e"));
-      if (VCU::right()) {
+      /*
           Serial.println("Disabling motor controller torque");
           pVCU->disableMotorController();
-      }
+      }*/
       //      if(pVCU->center()){
       //        Serial.println("Setting torque to " + String((int) genericTorque));
       //        pVCU->setTorqueValue((int) genericTorque);
