@@ -156,7 +156,7 @@ public:
         }else{
           Serial.println("card initialized.");
         }
-        char tryFileName[12] = "";
+        char tryFileName[13] = "";
         //sdLoggerStartTime = hour()*10000 + minute()*100 + SaveDataToSD::countAllFiles(); // http://i.imgur.com/Me04jVB.jpg
         sprintf(tryFileName, "%02d%s%02d%s%02d", hour(), "_", minute(), "_", second());
         //sprintf(tryFileName, "%s%i", tryFileName, sdLoggerStartTime);
@@ -772,6 +772,7 @@ class WriteTorqueValue : public VCUTask {
 public:
     void execute() override {
       float genericTorque = pVCU->calculateTorqueRegisterValueForWrite();
+      /*
       Serial.print("RAW torque: ");
       Serial.print(genericTorque);
       int packCurrent = (mcObjects[2].values[1] << 8) + mcObjects[2].values[0];
@@ -781,6 +782,7 @@ public:
       }
       Serial.print("DERATED torque: ");
       Serial.print(genericTorque);
+      */
 
 //      Serial.println("I could set torque to " + String(genericTorque));
       // Serial.println(String(genericTorque));
