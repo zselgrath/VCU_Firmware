@@ -177,7 +177,11 @@ public:
         Serial.print("globalFileName: ");
         Serial.println(globalFileName);
 #endif
-        logToFile("begin", globalFileName);
+        char beginLine[100];
+        sprintf(beginLine, "--- begin %02d:%02d:%02d on %02d/%02d/%02d ---", hour(), minute(), second(), month(), day(), year());
+        delay(500);
+        logToFile(beginLine, globalFileName);
+        delay(500);
         logToFile(getTitleString(), globalFileName);
     }
 
