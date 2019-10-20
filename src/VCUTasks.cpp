@@ -69,23 +69,11 @@ public:
       // Serial.println("MC: " + mcString);
 
       String lineToWrite = mcString;
-      char fileName[12];
-      String asString = getLogFileName();
-      getLogFileName().toCharArray(fileName, 12);
-
-      logToFile(getGeneralReportString() + " mc: " + lineToWrite, fileName);
-      // logToFile(getGeneralReportString(), fileName);
+      logToFile(getGeneralReportString() + " mc: " + lineToWrite, globalFileName);
 
       unsigned long end = micros();
       Serial.println("Time to log: " + String(end - start));
     }
-
-    String getLogFileName(){
-      char fileName[12] = "";
-      sprintf(fileName, "%s%i", fileName, sdLoggerStartTime);
-      sprintf(fileName, "%s%s", fileName, ".txt");
-      return String(fileName);
-    };
 
     void logToFile(String stringToWrite, char* fileNameToWriteTo){
 #ifdef USE_I2C_LOGGING
@@ -168,25 +156,33 @@ public:
         }else{
           Serial.println("card initialized.");
         }
-        char fileName2[12] = "";
-        sdLoggerStartTime = hour()*10000 + minute()*100 + SaveDataToSD::countAllFiles(); // http://i.imgur.com/Me04jVB.jpg
-        sprintf(fileName2, "%s%i", fileName2, sdLoggerStartTime);
-        sprintf(fileName2, "%s%s", fileName2, ".txt");
-        Serial.print("FileName2: ");
-        Serial.println(fileName2);
-        dataFile = SD.open(fileName2, FILE_WRITE);
+        char tryFileName[13] = "";
+        //sdLoggerStartTime = hour()*10000 + minute()*100 + SaveDataToSD::countAllFiles(); // http://i.imgur.com/Me04jVB.jpg
+        sprintf(tryFileName, "%02d%s%02d%s%02d", hour(), "_", minute(), "_", second());
+        //sprintf(tryFileName, "%s%i", tryFileName, sdLoggerStartTime);
+        sprintf(tryFileName, "%s%s", tryFileName, ".txt");
+        Serial.print("tryFileName: ");
+        Serial.println(tryFileName);
+        dataFile = SD.open(tryFileName, FILE_WRITE);
         dataFile.close();
-        if(SD.exists(fileName2)){
+        if (SD.exists(tryFileName))
+        {
           Serial.println("Datafile exists!");
-        }else{
+          sprintf(globalFileName, tryFileName);
+        }
+        else
+        {
           Serial.println("Datafile doesn't exist.");
         }
+        Serial.print("globalFileName: ");
+        Serial.println(globalFileName);
 #endif
-        // Serial.println("Labels: " + getTitleString());
-        char logFileName[12];
-        getLogFileName().toCharArray(logFileName, 12);
-        logToFile("begin", logFileName);
-        logToFile(getTitleString(), logFileName);
+        char beginLine[100];
+        sprintf(beginLine, "--- begin %02d:%02d:%02d on %02d/%02d/%02d ---", hour(), minute(), second(), month(), day(), year());
+        delay(500);
+        logToFile(beginLine, globalFileName);
+        delay(500);
+        logToFile(getTitleString(), globalFileName);
     }
 
     String getTitleString(){
@@ -780,6 +776,7 @@ class WriteTorqueValue : public VCUTask {
 public:
     void execute() override {
       float genericTorque = pVCU->calculateTorqueRegisterValueForWrite();
+      /*
       Serial.print("RAW torque: ");
       Serial.print(genericTorque);
       int packCurrent = (mcObjects[2].values[1] << 8) + mcObjects[2].values[0];
@@ -789,6 +786,7 @@ public:
       }
       Serial.print("DERATED torque: ");
       Serial.print(genericTorque);
+      */
 
 //      Serial.println("I could set torque to " + String(genericTorque));
       // Serial.println(String(genericTorque));

@@ -95,6 +95,7 @@
 
 // SD Card Logging variables
 static File dataFile;
+static char globalFileName[13];  
 // static const int SD_CHIP_SELECT = BUILTIN_SDCARD;
 #define SD_CHIP_SELECT BUILTIN_SDCARD
 static int sdLoggerStartTime;

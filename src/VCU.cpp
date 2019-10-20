@@ -13,6 +13,11 @@ bool carIsReadyToDrive = false;
 
 // Reads ADC values for both APPS sensors as well as the BSE and appends them to the oversampling array
 
+time_t getTeensy3Time()
+{
+  return Teensy3Clock.get();
+}
+
 static void onReceive(int packetSize) {
   // received a packet
   // Serial.print("\nReceived ");
@@ -150,10 +155,17 @@ void VCU::init() {
     pinMode(S_CENTER_PIN, INPUT);
     pinMode(START_BUTTON_PIN, INPUT_PULLUP);
     
-    //Teensy3Clock.set(__DATE__);
-//  Teensy3Clock.set(DateTime(F(__DATE__), F(__TIME__)));
-//  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-    //RTC.adjust(DateTime(__DATE__, __TIME__));
+    //Teensy3RTC
+    setSyncProvider(getTeensy3Time);
+    if (timeStatus() != timeSet)
+    {
+      Serial.println("Unable to sync with the RTC");
+    }
+    else
+    {
+      Serial.println("RTC has set the system time");
+    }
+    delay(5000);
 
     // Default variable initialization
     this->maxAdcValue = pow(2, ADC_READ_RESOLUTION);
