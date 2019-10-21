@@ -95,6 +95,7 @@
 
 // SD Card Logging variables
 static File dataFile;
+static char globalFileName[13];  
 // static const int SD_CHIP_SELECT = BUILTIN_SDCARD;
 #define SD_CHIP_SELECT BUILTIN_SDCARD
 static int sdLoggerStartTime;
@@ -209,7 +210,7 @@ public:
     const byte MOTOR_CONTROLLER_ADDRESS_VOLTAGE_OUTPUT = 0x8A;
     static const byte MOTOR_CONTROLLER_ADDRESS_CURRENT_PACK = 0x20;
     const byte MOTOR_CONTROLLER_ADDRESS_CURRENT_PHASE = 0x5F;
-    const byte MOTOR_CONTROLLER_ADDRESS_MOTOR_TEMPERATURE = 0x49;
+    const byte MOTOR_CONTROLLER_ADDRESS_MOTOR_TEMPERATURE = 0xA3; //THIS WAS 49, but A3 human readable with scaling
     const byte MOTOR_CONTROLLER_ADDRESS_IGBT_TEMPERATURE = 0x4A;
     const byte MOTOR_CONTROLLER_ADDRESS_SETPOINT_CURRENT = 0x22;
     const byte MOTOR_CONTROLLER_ADDRESS_SETPOINT_TORQUE = 0x90;
@@ -233,6 +234,7 @@ protected:
     // Friend classes (usually VCUTask classes) which can access the protected VCU variables here
     friend class UpdateThrottleAnalogValues;
     friend class DoSpecificDebugThing;
+    friend class WriteTorqueValue;
     friend class SaveDataToSD;
     friend class VehicleStateTask;
     friend class OffState; // Friended to allow writing values to stop motor controller
