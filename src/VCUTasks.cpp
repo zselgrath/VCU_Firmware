@@ -1,11 +1,60 @@
 #include "VCU.h"
 #include "SimpleKalmanFilter.h"
 #define MAXIMUM_ON_TIME 3600000 // 1 HR
+//float FiltAPPS =0;
 
 // To add a new VCUTask, edit 3 things:
 // 1. Add to this class, by adding a new class extending/implementing VCUTask
 // 2. Modify TASKS_ARRAY_SIZE in VCU.h so that the array of VCUTask pointers can be sized correctly
 // 3. Modify the VCU.cpp init() method, by adding the task to the array of tasks
+
+
+/*
+SimpleKalmanFilter::SimpleKalmanFilter(float mea_e, float est_e, float q)
+{
+  _err_measure = mea_e;
+  _err_estimate = est_e;
+  _q = q;
+}
+
+float SimpleKalmanFilter::updateEstimate(float mea)
+{
+  _kalman_gain = _err_estimate / (_err_estimate + _err_measure);
+  _current_estimate = _last_estimate + _kalman_gain * (mea - _last_estimate);
+  _err_estimate = (1.0 - _kalman_gain) * _err_estimate + fabs(_last_estimate - _current_estimate) * _q;
+  _last_estimate = _current_estimate;
+
+  return _current_estimate;
+}
+
+void SimpleKalmanFilter::setMeasurementError(float mea_e)
+{
+  _err_measure = mea_e;
+}
+
+void SimpleKalmanFilter::setEstimateError(float est_e)
+{
+  _err_estimate = est_e;
+}
+
+void SimpleKalmanFilter::setProcessNoise(float q)
+{
+  _q = q;
+}
+
+float SimpleKalmanFilter::getKalmanGain()
+{
+  return _kalman_gain;
+}
+
+float SimpleKalmanFilter::getEstimateError()
+{
+  return _err_estimate;
+}
+*/
+
+//zfloat FiltApps = 0;
+
 
 class UpdateThrottleAnalogValues : public VCUTask {
 public:
@@ -125,6 +174,7 @@ public:
       toReturn.concat(String(" a1T:").concat(String(pVCU->getApps1Travel(), 6)));
       toReturn.concat(String(" a2T:").concat(String(pVCU->getApps2Travel(), 6)));
       toReturn.concat(String(" APPS:").concat(String(pVCU->getCheckedAndScaledAppsValue(), 6)));
+      //toReturn.concat(String(" FiltAPPS:").concat();
       toReturn.concat(String(" sdcp:").concat(pVCU->getSdcCurrentPos()));
       toReturn.concat(String(" sdcn:").concat(pVCU->getSdcCurrentNeg()));
       toReturn.concat(String(" rr:").concat(runRate));
@@ -773,58 +823,21 @@ private:
 
 // This is a debugging and development class. What it does depends on what is being worked on.
 class WriteTorqueValue : public VCUTask {
+
+
 public:
 
 
 
-SimpleKalmanFilter skf=simpleKalmanFilter(.01, .01, 0.01);
 
-
-SimpleKalmanFilter::SimpleKalmanFilter(float mea_e, float est_e, float q)
-{
-  _err_measure=mea_e;
-  _err_estimate=est_e;
-  _q = q;
-}
-
-float SimpleKalmanFilter::updateEstimate(float mea)
-{
-  _kalman_gain = _err_estimate/(_err_estimate + _err_measure);
-  _current_estimate = _last_estimate + _kalman_gain * (mea - _last_estimate);
-  _err_estimate =  (1.0 - _kalman_gain)*_err_estimate + fabs(_last_estimate-_current_estimate)*_q;
-  _last_estimate=_current_estimate;
-
-  return _current_estimate;
-}
-
-void SimpleKalmanFilter::setMeasurementError(float mea_e)
-{
-  _err_measure=mea_e;
-}
-
-void SimpleKalmanFilter::setEstimateError(float est_e)
-{
-  _err_estimate=est_e;
-}
-
-void SimpleKalmanFilter::setProcessNoise(float q)
-{
-  _q=q;
-}
-
-float SimpleKalmanFilter::getKalmanGain() {
-  return _kalman_gain;
-}
-
-float SimpleKalmanFilter::getEstimateError() {
-  return _err_estimate;
-}
 //yeet
+    SimpleKalmanFilter skf = SimpleKalmanFilter(.005,.005,.01);
     void execute() override {
      
       float genericTorque = pVCU->calculateTorqueRegisterValueForWrite();
       genericTorque=genericTorque/-32768;
       float estimated_value = skf.updateEstimate(genericTorque);
+      
       genericTorque=estimated_value*-32768;
       //0 to (-32768)
       

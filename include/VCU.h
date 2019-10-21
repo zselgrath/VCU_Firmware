@@ -321,5 +321,4 @@ extern long LastMotorControllerBusVoltageReportTime;
 extern short LastMotorControllerBusVoltageRaw;
 extern bool carIsReadyToDrive;
 
-
 #endif
