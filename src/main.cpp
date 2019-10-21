@@ -1,6 +1,6 @@
 /*
   VCU Testsketch
-  Zack
+  Ben
 
   TODO:
     BSE pulldown and capacitor
