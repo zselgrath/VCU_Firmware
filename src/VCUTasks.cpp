@@ -1,5 +1,5 @@
 #include "VCU.h"
-
+#include "SimpleKalmanFilter.h"
 #define MAXIMUM_ON_TIME 3600000 // 1 HR
 
 // To add a new VCUTask, edit 3 things:
@@ -774,37 +774,65 @@ private:
 // This is a debugging and development class. What it does depends on what is being worked on.
 class WriteTorqueValue : public VCUTask {
 public:
-    void execute() override {
-      float genericTorque = pVCU->calculateTorqueRegisterValueForWrite();
-      /*
-      Serial.print("RAW torque: ");
-      Serial.print(genericTorque);
-      int packCurrent = (mcObjects[2].values[1] << 8) + mcObjects[2].values[0];
-      int derateCurrent = 300;
-      if (packCurrent>derateCurrent){
-        genericTorque=genericTorque*0.7;
-      }
-      Serial.print("DERATED torque: ");
-      Serial.print(genericTorque);
-      */
 
-//      Serial.println("I could set torque to " + String(genericTorque));
-      // Serial.println(String(genericTorque));
-      //Serial.println(pVCU->getCheckedAndScaledAppsValue());
-      //Serial.println("VCU: " + String("e"));
-      /*
-          Serial.println("Disabling motor controller torque");
-          pVCU->disableMotorController();
-      }*/
-      //      if(pVCU->center()){
-      //        Serial.println("Setting torque to " + String((int) genericTorque));
-      //        pVCU->setTorqueValue((int) genericTorque);
-      //      }else{
-      //        pVCU->setTorqueValue(0);
-      //      }
+
+
+SimpleKalmanFilter skf=simpleKalmanFilter(.01, .01, 0.01);
+
+
+SimpleKalmanFilter::SimpleKalmanFilter(float mea_e, float est_e, float q)
+{
+  _err_measure=mea_e;
+  _err_estimate=est_e;
+  _q = q;
+}
+
+float SimpleKalmanFilter::updateEstimate(float mea)
+{
+  _kalman_gain = _err_estimate/(_err_estimate + _err_measure);
+  _current_estimate = _last_estimate + _kalman_gain * (mea - _last_estimate);
+  _err_estimate =  (1.0 - _kalman_gain)*_err_estimate + fabs(_last_estimate-_current_estimate)*_q;
+  _last_estimate=_current_estimate;
+
+  return _current_estimate;
+}
+
+void SimpleKalmanFilter::setMeasurementError(float mea_e)
+{
+  _err_measure=mea_e;
+}
+
+void SimpleKalmanFilter::setEstimateError(float est_e)
+{
+  _err_estimate=est_e;
+}
+
+void SimpleKalmanFilter::setProcessNoise(float q)
+{
+  _q=q;
+}
+
+float SimpleKalmanFilter::getKalmanGain() {
+  return _kalman_gain;
+}
+
+float SimpleKalmanFilter::getEstimateError() {
+  return _err_estimate;
+}
+//yeet
+    void execute() override {
+     
+      float genericTorque = pVCU->calculateTorqueRegisterValueForWrite();
+      genericTorque=genericTorque/-32768;
+      float estimated_value = skf.updateEstimate(genericTorque);
+      genericTorque=estimated_value*-32768;
+      //0 to (-32768)
+      
+        
       if (pVCU->readyToDrive())
       {
         //Serial.println("GENERIC TORQUE " + String(int(genericTorque))); //DEBUG ONLY
+
         pVCU->setTorqueValue((int) genericTorque);
       }else{
         //Serial.println("CAR NOT RTD"); //DEBUG ONLY
