@@ -1,4 +1,5 @@
 #include "VCU.h"
+#include <utime.h>
 
 #define MAXIMUM_ON_TIME 3600000 // 1 HR
 
@@ -174,6 +175,12 @@ public:
         {
           Serial.println("Datafile doesn't exist.");
         }
+        struct utimbuf newTimes;
+        time_t timeNow = now();
+        // set both times so we don't have to access it
+        newTimes.actime = timeNow; // access time
+        newTimes.modtime = timeNow; // modification time
+        utime(globalFileName, &newTimes)
         Serial.print("globalFileName: ");
         Serial.println(globalFileName);
 #endif
